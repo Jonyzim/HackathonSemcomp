@@ -55,4 +55,5 @@ else:
         dist_list.append([dist,name_data[i]])
         i+=1
     dist_list=sorted(dist_list, key=lambda x: x[0])
-    print(dist_list[0:5])
+    for d in dist_list[0:5]:
+        print(d[0],d[1])
