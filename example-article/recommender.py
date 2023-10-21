@@ -13,7 +13,7 @@ import cohere
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-api_key = os.environ["CO_KEY"]
+api_key = "L41u8TnPpclKHjF0jJCxjD0SZ8O5yFQOaXoTibRL"
 co = cohere.Client(api_key)
 
 
@@ -53,7 +53,7 @@ def truncate_text(input_text):
 def classify_text(input_text):
     text = truncate_text(input_text)
     classifications = co.classify(
-        model="504b1b30-4927-464d-9d4c-412f9771775b-ft", inputs=[text]  # replace with your finetune model ID
+        model="embed-multilingual", inputs=[text]  # replace with your finetune model ID
     )
     return classifications.classifications[0].prediction
 
@@ -118,3 +118,5 @@ def extract_tags(complete_prompt):
         tags = "None"
 
     return tags
+
+print(classify_text("ola tudo bem"))
