@@ -5,15 +5,7 @@ import numpy as np
 # Specify the path to your CSV file and the column name with text data
 csv_file_path = 'lyrics-data.csv'
 text_column_name = 'Lyric'  # Replace with the actual column name
-text_prompt=""""Que lindos olhos
-Que estão em ti!
-Tão lindos olhos
-Eu nunca vi...
-
-Pode haver belos
-Mas não tais quais;
-Não há no mundo
-Quem tenha iguais."""
+text_prompt=""""Girafinha"""
 
 # Initialize the Cohere client with your API key
 co = cohere.Client('L41u8TnPpclKHjF0jJCxjD0SZ8O5yFQOaXoTibRL')
@@ -26,6 +18,7 @@ df = pd.read_csv(csv_file_path, nrows=5000)
 # Read data from a CSV file using Pandas
 def read_csv_and_embed(csv_file_path, text_column_name):
     text_data = df[text_column_name].tolist()
+
     text_data.append(text_prompt)
     embeddings = embed_text(text_data)
     return embeddings
@@ -43,12 +36,12 @@ if embeddings is None or not embeddings:
     print("Embeddings are empty or None.")
 else:
     # Combine the embeddings for each artist
-    artist_embeddings = np.vstack(embeddings)
+    lyrics_embedding = np.vstack(embeddings)
 
     # Apply PCA to reduce the dimensionality
     pca = PCA(n_components=500)  # Specify the number of components you want
-    reduced_embeddings = pca.fit_transform(artist_embeddings).tolist()
-    reduced_embeddings=artist_embeddings.tolist()
+    reduced_embeddings = pca.fit_transform(lyrics_embedding).tolist()
+    reduced_embeddings=lyrics_embedding.tolist()
     print(sum(pca.explained_variance_ratio_))
     # Print the reduced embeddings
     # print(reduced_embeddings)
@@ -60,7 +53,6 @@ else:
     min_id=-1
     dist_list=[]
     for emb in reduced_embeddings:
-        
         dist = np.linalg.norm(np.array(emb)-prompt)
         dist_list.append([dist,name_data[i],i])
         i+=1
