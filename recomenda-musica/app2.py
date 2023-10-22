@@ -3,9 +3,9 @@ import cohere
 from sklearn.decomposition import PCA
 import numpy as np
 # Specify the path to your CSV file and the column name with text data
-csv_file_path = 'train.csv'
-text_column_name = 'Lyrics'  # Replace with the actual column name
-text_prompt="""nature, beauty, insects"""
+csv_file_path = 'spotify.csv'
+text_column_name = 'lyrics'  # Replace with the actual column name
+text_prompt="""Futuristic, technological, mystery, intrigue"""
 
 
 # Initialize the Cohere client with your API key
@@ -15,10 +15,10 @@ def embed_text(text_data, model='small'):
     response = co.embed(texts=text_data, model=model)
     return response
 
-df = pd.read_csv(csv_file_path, nrows=3000)
-#mask = df['Lyrics'].str.len() < 6000
-#df = df[mask]
+df = pd.read_csv(csv_file_path,nrows=4000)
 
+mask = df['lyrics'].str.len() < 6000
+df = df[mask]
 #df = df[mask]
 # Read data from a CSV file using Pandas
 def read_csv_and_embed(csv_file_path, text_column_name):
@@ -33,8 +33,8 @@ def read_csv_and_embed(csv_file_path, text_column_name):
 # Call the function to read the CSV and embed the text data
 embeddings = read_csv_and_embed(csv_file_path, text_column_name)
 
-artist_data = df['Artist'].tolist()
-name_data = df['Song'].tolist()
+artist_data = df['track_artist'].tolist()
+name_data = df['track_name'].tolist()
 
 text_data = df[text_column_name].tolist()
 # Check if embeddings is empty or None
@@ -48,7 +48,7 @@ else:
     pca = PCA(n_components=500)  # Specify the number of components you want
     reduced_embeddings = pca.fit_transform(lyrics_embedding).tolist()
     reduced_embeddings=lyrics_embedding.tolist()
-    print(sum(pca.explained_variance_ratio_))
+    # print(sum(pca.explained_variance_ratio_))
     # Print the reduced embeddings
     # print(reduced_embeddings)
     prompt=reduced_embeddings[-1]
