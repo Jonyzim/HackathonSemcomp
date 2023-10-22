@@ -3,9 +3,9 @@ import cohere
 from sklearn.decomposition import PCA
 import numpy as np
 # Specify the path to your CSV file and the column name with text data
-csv_file_path = 'lyrics-data.csv'
-text_column_name = 'Lyric'  # Replace with the actual column name
-text_prompt=""""Girafinha"""
+csv_file_path = 'train.csv'
+text_column_name = 'Lyrics'  # Replace with the actual column name
+text_prompt=""""ark, mysterious, and eerie. It evokes a sense of gothic mysticism, with the imagery of witches in cloaks gathering in the shadows, communing with spirits, and casting spells under the pale moon. The atmosphere is filled with an otherworldly, supernatural ambiance, and there's a palpable sense of mystique and darkness."""
 
 # Initialize the Cohere client with your API key
 co = cohere.Client('L41u8TnPpclKHjF0jJCxjD0SZ8O5yFQOaXoTibRL')
@@ -14,7 +14,7 @@ def embed_text(text_data, model='small'):
     response = co.embed(texts=text_data, model=model)
     return response
 
-df = pd.read_csv(csv_file_path, nrows=5000)
+df = pd.read_csv(csv_file_path, nrows=4000)
 # Read data from a CSV file using Pandas
 def read_csv_and_embed(csv_file_path, text_column_name):
     text_data = df[text_column_name].tolist()
@@ -28,7 +28,7 @@ def read_csv_and_embed(csv_file_path, text_column_name):
 embeddings = read_csv_and_embed(csv_file_path, text_column_name)
 
 
-name_data = df['SLink'].tolist()
+name_data = df['Song'].tolist()
 
 text_data = df[text_column_name].tolist()
 # Check if embeddings is empty or None
@@ -57,7 +57,23 @@ else:
         dist_list.append([dist,name_data[i],i])
         i+=1
     dist_list=sorted(dist_list, key=lambda x: x[0])
-    for d in dist_list[0:5]:
-        print(d[0],d[1])
+    songs=[]
+    for d in dist_list[0:200]:
+        #print(round(d[0],2),d[1])
+        d[0]=round(d[0],2)
+        songs.append(text_data[d[2]])
 
-    print(text_data[dist_list[0][2]])
+    #print(text_data[dist_list[0][2]])
+
+    query = "What are the lyrics with mood most similar to '"+text_prompt+"'"
+    print(query)
+    results = co.rerank(query=query, documents=songs, top_n=10, model='rerank-english-v2.0') # Change top_n to change the number of results returned. If top_n is not passed, all results will be returned.
+    for idx, r in enumerate(results):
+        print(f"Document Rank: {idx + 1}, Document Index: {r.index}")
+        print(f"Song: {dist_list[r.index]}")
+        if idx ==0:
+            print(f"Document: {r.document['text']}")
+        print(f"Relevance Score: {r.relevance_score:.2f}")
+        print("\n")
+    
+
